@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Taiv Email Signature Generator</title>
+
+  <style>
+    :root{
+      --bg: #191919;
+      --surface: #ffffff;
+      --surface-2: #fbfbfd;
+      --border: #e6e8f0;
+      --border-2: #dfe3ee;
+
+      --text: #0f172a;
+      --muted: #64748b;
+
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --ring: rgba(37, 99, 235, 0.25);
+
+      --warn-soft: #fff7ed;
+      --warn-border: #fed7aa;
+
+      --success: #16a34a;
+      --success-hover: #15803d;
+
+      --shadow: 0 1px 0 rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.06);
+      --radius: 14px;
+
+      --taiv-navy: #0A0420;
+      --accent-tagline: #6F3FEE;
+
+      --right-gap: 16px; /* spacing between section 2 and 3 */
+    }
+
+    * { box-sizing: border-box; }
+    body{
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    .main{ padding: 14px; }
+    .frame{
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-height: calc(100vh - 28px);
+      overflow: hidden;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .topLeft{ flex: 1 1 auto; min-width: 0; font-size: 13px; color: var(--muted); }
+    .topLeft b{ color: var(--text); font-weight: 800; font-size: 13px; }
+
+    .statusPill{
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      border-radius: 999px;
+      padding: 6px 10px;
+      white-space: nowrap;
+    }
+
+    .content{ padding: 18px; }
+
+    .pageTitle{
+      font-size: 22px;
+      font-weight: 800;
+      margin: 2px 0 14px 0;
+      letter-spacing: -0.02em;
+    }
+    .subnote{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin: 0 0 16px 0;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .rightStack{
+      display:flex;
+      flex-direction: column;
+      gap: var(--right-gap);
+      align-items: stretch;
+      min-width: 0;
+    }
+
+    .card{
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      min-width: 0;
+    }
+
+    .cardHeader{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .cardHeaderIcon{
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: var(--primary);
+      flex: 0 0 auto;
+    }
+    .cardHeaderIcon svg{ width: 16px; height: 16px; }
+    .cardHeaderTitle{ font-size: 16px; font-weight: 800; margin: 0; }
+    .cardHeaderDesc{ font-size: 12px; color: var(--muted); margin: 2px 0 0 0; }
+
+    label{
+      display:block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 0 0 6px 0;
+    }
+
+    input, select, textarea{
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-2);
+      background: #ffffff;
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+    }
+    input:focus, select:focus, textarea:focus{
+      box-shadow: 0 0 0 4px var(--ring);
+      border-color: #bfdbfe;
+    }
+    textarea{
+      resize: vertical;
+      min-height: 96px;
+      line-height: 1.4;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size: 12.5px;
+      background: #fbfbfd;
+    }
+
+    .row{ margin-bottom: 12px; }
+    .helper{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .error{
+      font-size: 12px;
+      color: #dc2626;
+      margin-top: 6px;
+      line-height: 1.35;
+      display:none;
+    }
+    .inputError{
+      border-color: rgba(220,38,38,0.45) !important;
+      box-shadow: 0 0 0 4px rgba(220,38,38,0.12) !important;
+    }
+
+    .toggleRow{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fafafa;
+    }
+    .toggleRow input[type="checkbox"]{
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      accent-color: var(--primary);
+      flex: 0 0 auto;
+    }
+    .toggleTitle{ margin: 0; font-size: 13px; font-weight: 800; }
+    .toggleCaption{ margin: 4px 0 0 0; font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      align-items: center;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      user-select: none;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:hover{ background: #f8fafc; }
+    .btn svg{ width: 16px; height: 16px; }
+
+    .btnPrimary{
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(37,99,235,0.18);
+    }
+    .btnPrimary:hover{ background: var(--primary-hover); border-color: var(--primary-hover); }
+
+    .btnSuccess{
+      background: var(--success);
+      border-color: var(--success);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(22,163,74,0.18);
+    }
+    .btnSuccess:hover{ background: var(--success-hover); border-color: var(--success-hover); }
+
+    .btnReset{
+      border-color: var(--warn-border);
+      background: var(--warn-soft);
+      color: #9a3412;
+    }
+    .btnReset:hover{ background: #ffedd5; }
+
+    .sectionLabel{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin: 0 0 8px 0;
+    }
+    .sectionLabelLeft{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .callout{
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      margin-top: 14px;
+    }
+
+    .sigFrame{
+      border: 1px dashed #d4d8e4;
+      border-radius: 12px;
+      padding: 14px;
+      background: #ffffff;
+      min-width: 0;
+    }
+
+    .extraLink { color: #6b7280; text-decoration: underline; }
+
+    .kbd{
+      display:inline-block;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      margin: 0 2px;
+    }
+
+    .steps{
+      margin: 10px 0 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .steps li{ margin: 6px 0; }
+    .steps a{
+      color: var(--primary);
+      text-decoration: underline;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .rightStack{ gap: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="main">
+    <div class="frame">
+      <div class="topbar">
+        <div class="topLeft">
+          <b>Taiv Email Sig Gen V1.2</b>
+        </div>
+        <div class="statusPill" id="status">Ready</div>
+      </div>
+
+      <div class="content">
+        <div class="pageTitle">Email Signature Generator</div>
+        <p class="subnote">
+          Complete Step 1, then 2, then 3.
+        </p>
+
+        <div class="grid">
+          <!-- LEFT: Section 1 -->
+          <section class="card">
+            <div class="cardHeader">
+              <div class="cardHeaderIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 12a4 4 0 1 0-4-4"></path>
+                  <path d="M20 21a8 8 0 0 0-16 0"></path>
+                  <path d="M16 8h6"></path>
+                  <path d="M19 5v6"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="cardHeaderTitle">1. Enter Your Information</p>
+                <p class="cardHeaderDesc">These fields update both outputs instantly.</p>
+              </div>
+            </div>
+
+            <div class="row">
+              <label>Full name</label>
+              <input id="name" value="Brooke Armstrong" />
+            </div>
+
+            <div class="row">
+              <label>Title</label>
+              <input id="title" value="Account Executive" />
+            </div>
+
+            <div class="row" id="phoneRow">
+              <label>Phone</label>
+              <input id="phoneInput" value="(204) 237-1212" />
+              <div class="helper" id="phoneHelp">Examples: (204) 237-1212, 204-237-1212, 2042371212</div>
+              <div class="error" id="phoneError">Phone number looks invalid. Use a 10-digit North American number.</div>
+            </div>
+
+            <div class="row">
+              <div class="toggleRow">
+                <input id="chkShowPhone" type="checkbox" />
+                <div>
+                  <p class="toggleTitle">Show phone number</p>
+                  <p class="toggleCaption">Turn off if you do not want your number in your signature.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <label>Tagline</label>
+              <select id="taglineSelect">
+                <option value="Give your TVs Superpowers">General: Give your TVs Superpowers</option>
+                <option value="Your TVs. Your Ads. Your Revenue.">Partner-facing: Your TVs. Your Ads. Your Revenue.</option>
+                <option value="Reach Engaged Audiences During Live Sports">Advertiser-facing: Reach Engaged Audiences During Live Sports</option>
+                <option value="">None</option>
+              </select>
+            </div>
+
+            <div class="row">
+              <label>Optional additions (Standard only)</label>
+
+              <div class="toggleRow" style="margin-bottom:10px;">
+                <input id="chkReview" type="checkbox" />
+                <div>
+                  <p class="toggleTitle">Leave us a review</p>
+                  <p class="toggleCaption">For Account Managers only. Uses a static Google Form link.</p>
+                </div>
+              </div>
+
+              <div class="toggleRow">
+                <input id="chkMeeting" type="checkbox" />
+                <div style="width:100%;">
+                  <p class="toggleTitle">Book a meeting with me</p>
+                  <p class="toggleCaption">Input your Calendly meeting link here.</p>
+                  <div id="meetingLinkWrap" style="margin-top:10px; display:none;">
+                    <input
+                      id="meetingLink"
+                      value=""
+                      placeholder="Example: https://calendly.com/brooke-taiv/30-minute-meeting"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="helper">These additions are not included in Lightweight.</div>
+            </div>
+
+            <div class="actions">
+              <button class="btn btnReset" id="resetBtn" type="button" title="Reset">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 1 1-3-6.7"></path>
+                  <path d="M21 3v6h-6"></path>
+                </svg>
+                Reset
+              </button>
+            </div>
+          </section>
+
+          <!-- RIGHT: Section 2 + Section 3 -->
+          <div class="rightStack">
+            <!-- Section 2 -->
+            <section class="card">
+              <div class="cardHeader">
+                <div class="cardHeaderIcon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 7h16"></path>
+                    <path d="M4 12h10"></path>
+                    <path d="M4 17h16"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="cardHeaderTitle">2. Select the Output Signature</p>
+                  <p class="cardHeaderDesc">
+                    Click Select, then copy with <span class="kbd">Cmd</span>+<span class="kbd">C</span> or <span class="kbd">Ctrl</span>+<span class="kbd">C</span>.
+                  </p>
+                </div>
+              </div>
+
+              <div class="sectionLabel">
+                <div class="sectionLabelLeft">Standard (Gmail)</div>
+              </div>
+
+              <div class="sigFrame">
+                <div id="signatureStandard" style="display:block; line-height:1.3; padding: 2px 0 6px 0; margin-top: 2px;">
+                  <div style="display:block; padding-top: 2px;">
+                    <a href="https://taiv.tv" target="_blank" style="text-decoration:none; display:inline-block;">
+                      <img
+                        src="https://cdn.prod.website-files.com/6452bada8ddf24f4f4b3ae18/69530146f44fd5131ebf8844_1addc7e60eeac3bfd868dd5209983ac2_Taiv%20Email%20Logo%203-02.png"
+                        alt="Taiv"
+                        width="140"
+                        style="display:block; border:0; outline:none; text-decoration:none;"
+                      />
+                    </a>
+                  </div>
+
+                  <div style="display:block; height:12px;"></div>
+
+                  <div id="stdName" style="font-size:14px; font-weight:bold; color:#0A0420; line-height:18px;">
+                    Brooke Armstrong
+                  </div>
+
+                  <div id="stdTitle" style="font-size:13px; color:#1F2933; line-height:17px; padding-bottom:6px;">
+                    Account Executive
+                  </div>
+
+                  <div style="font-size:13px; color:#1F2933; line-height:17px;">
+                    <a href="https://taiv.tv" target="_blank" style="color:#1F2933; text-decoration:underline;">taiv.tv</a>
+                    <span id="stdPipe" style="display:inline;"> | </span>
+                    <a id="stdPhoneLink" href="tel:+12042371212" style="color:#1F2933; text-decoration:underline;">
+                      <span id="stdPhoneDisplay">(204) 237-1212</span>
+                    </a>
+                  </div>
+
+                  <div id="stdTaglineWrap" style="padding-top:6px;">
+                    <div id="stdTagline" style="font-size:12px; color:#6F3FEE; line-height:16px;">
+                      Give your TVs Superpowers
+                    </div>
+                  </div>
+
+                  <div id="stdExtrasWrap" style="display:none; padding-top:10px;">
+                    <div id="stdReviewWrap" style="display:none; font-size:12px; line-height:16px; padding-top:4px;">
+                      <a href="https://forms.gle/uioiexjqWfEzb4TA6" target="_blank" class="extraLink">
+                        Leave us a review
+                      </a>
+                    </div>
+                    <div id="stdMeetingWrap" style="display:none; font-size:12px; line-height:16px; padding-top:4px;">
+                      <a id="stdMeetingLink" href="" target="_blank" class="extraLink">
+                        Book a meeting with me
+                      </a>
+                    </div>
+                  </div>
+
+                  <div style="display:block; height:4px;"></div>
+                </div>
+              </div>
+
+              <div class="actions" style="margin-top:12px;">
+                <button class="btn btnPrimary" id="selectStandardBtn" type="button" title="Select standard signature">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 7h16"></path>
+                    <path d="M4 12h10"></path>
+                    <path d="M4 17h16"></path>
+                  </svg>
+                  Select
+                </button>
+                <div class="helper" style="margin:0;">
+                  Then press <span class="kbd">Cmd</span>+<span class="kbd">C</span> / <span class="kbd">Ctrl</span>+<span class="kbd">C</span>
+                </div>
+              </div>
+
+              <div style="height:14px;"></div>
+
+              <div class="sectionLabel">
+                <div class="sectionLabelLeft">Lightweight (plain text)</div>
+              </div>
+              <div class="helper" style="margin-top:0;">Recommended for cold outbound tools.</div>
+
+              <textarea id="lightText" readonly></textarea>
+
+              <div class="actions">
+                <button class="btn btnPrimary" id="selectLightBtn" type="button" title="Select lightweight signature">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 7h16"></path>
+                    <path d="M4 12h10"></path>
+                    <path d="M4 17h16"></path>
+                  </svg>
+                  Select
+                </button>
+                <div class="helper" style="margin:0;">
+                  Then press <span class="kbd">Cmd</span>+<span class="kbd">C</span> / <span class="kbd">Ctrl</span>+<span class="kbd">C</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="card">
+              <div class="cardHeader">
+                <div class="cardHeaderIcon" aria-hidden="true" style="background:#f0fdf4;border-color:#dcfce7;color:#16a34a;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 3h7v7"></path>
+                    <path d="M10 14 21 3"></path>
+                    <path d="M21 14v7H3V3h7"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p class="cardHeaderTitle">3. Paste into Gmail</p>
+                  <p class="cardHeaderDesc">Open Gmail settings, add your signature, set defaults, save.</p>
+                </div>
+              </div>
+
+              <div class="actions" style="margin-top:0;">
+                <a
+                  class="btn btnSuccess"
+                  href="https://mail.google.com/mail/u/0/#settings/general"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Open Gmail settings"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 3h7v7"></path>
+                    <path d="M10 14 21 3"></path>
+                    <path d="M21 14v7H3V3h7"></path>
+                  </svg>
+                  Open Gmail Settings
+                </a>
+
+                <div class="helper" style="margin:0;">
+                  Link (if needed):
+                  <a href="https://mail.google.com/mail/u/0/#settings/general" target="_blank" rel="noopener noreferrer">
+                    https://mail.google.com/mail/u/0/#settings/general
+                  </a>
+                </div>
+              </div>
+
+              <ol class="steps">
+                <li>Scroll down to the Signature section.</li>
+                <li>Create a new signature.</li>
+                <li>Paste the generated signature into the box.</li>
+                <li>Edit signature defaults so it shows up in your emails.</li>
+                <li>Scroll to the bottom of the page and click Save changes.</li>
+              </ol>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+    const statusEl = el("status");
+    const MEETING_EXAMPLE = "https://calendly.com/brooke-taiv/30-minute-meeting";
+
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+      clearTimeout(setStatus._t);
+      setStatus._t = setTimeout(() => statusEl.textContent = "Ready", 2500);
+    }
+
+    function digitsOnly(s) { return String(s || "").replace(/\D/g, ""); }
+
+    function isValidPhone(input) {
+      const d = digitsOnly(input);
+      return d.length === 10 || (d.length === 11 && d.startsWith("1"));
+    }
+
+    function formatPhoneDisplay(input) {
+      const raw = String(input || "").trim();
+      const d = digitsOnly(raw);
+      if (d.length === 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+      if (d.length === 11 && d.startsWith("1")) {
+        const n = d.slice(1);
+        return `(${n.slice(0,3)}) ${n.slice(3,6)}-${n.slice(6)}`;
+      }
+      return raw;
+    }
+
+    function phoneToTelHref(input) {
+      const raw = String(input || "").trim();
+      if (raw.startsWith("+")) {
+        const e164 = "+" + raw.slice(1).replace(/\D/g, "");
+        return e164.length > 1 ? "tel:" + e164 : "tel:";
+      }
+      const d = digitsOnly(raw);
+      if (d.length === 10) return "tel:+1" + d;
+      if (d.length === 11 && d.startsWith("1")) return "tel:+" + d;
+      return d ? "tel:" + d : "tel:";
+    }
+
+    function normalizeUrl(raw) {
+      const s = String(raw || "").trim();
+      if (!s) return "";
+      if (s.startsWith("http://") || s.startsWith("https://")) return s;
+      return "https://" + s;
+    }
+
+    function renderExtras() {
+      const includeReview = el("chkReview").checked;
+      const includeMeeting = el("chkMeeting").checked;
+
+      el("meetingLinkWrap").style.display = includeMeeting ? "block" : "none";
+
+      const meetingUser = normalizeUrl(el("meetingLink").value);
+      const meetingHref = includeMeeting ? (meetingUser || MEETING_EXAMPLE) : "";
+
+      const anyExtras = includeReview || includeMeeting;
+      el("stdExtrasWrap").style.display = anyExtras ? "block" : "none";
+
+      el("stdReviewWrap").style.display = includeReview ? "block" : "none";
+
+      el("stdMeetingWrap").style.display = includeMeeting ? "block" : "none";
+      el("stdMeetingLink").href = meetingHref;
+    }
+
+    function applyPhoneValidation(phoneRaw, showPhone) {
+      const phoneInput = el("phoneInput");
+      const phoneError = el("phoneError");
+
+      if (!showPhone) {
+        phoneInput.classList.remove("inputError");
+        phoneError.style.display = "none";
+        return;
+      }
+
+      const valid = isValidPhone(phoneRaw);
+      if (!valid && phoneRaw.trim() !== "") {
+        phoneInput.classList.add("inputError");
+        phoneError.style.display = "block";
+      } else {
+        phoneInput.classList.remove("inputError");
+        phoneError.style.display = "none";
+      }
+    }
+
+    function render() {
+      const name = el("name").value.trim();
+      const title = el("title").value.trim();
+      const phoneRaw = el("phoneInput").value;
+      const showPhone = el("chkShowPhone").checked;
+
+      el("phoneRow").style.display = showPhone ? "block" : "none";
+      applyPhoneValidation(phoneRaw, showPhone);
+
+      const phoneFormatted = formatPhoneDisplay(phoneRaw);
+      const telHref = phoneToTelHref(phoneRaw);
+      const tagline = el("taglineSelect").value;
+
+      el("stdName").textContent = name || "";
+      el("stdTitle").textContent = title || "";
+
+      if (showPhone) {
+        el("stdPipe").style.display = "inline";
+        el("stdPhoneLink").style.display = "inline";
+        el("stdPhoneDisplay").textContent = phoneFormatted || "";
+        el("stdPhoneLink").setAttribute("href", telHref);
+      } else {
+        el("stdPipe").style.display = "none";
+        el("stdPhoneLink").style.display = "none";
+      }
+
+      if (tagline) {
+        el("stdTagline").textContent = tagline;
+        el("stdTaglineWrap").style.display = "block";
+      } else {
+        el("stdTaglineWrap").style.display = "none";
+      }
+
+      el("lightText").value = showPhone
+        ? `${name}\n${title}\ntaiv.tv | ${phoneFormatted}`.trim()
+        : `${name}\n${title}\ntaiv.tv`.trim();
+
+      renderExtras();
+    }
+
+    function onPhoneBlur() {
+      const current = el("phoneInput").value;
+      if (el("chkShowPhone").checked && isValidPhone(current)) {
+        el("phoneInput").value = formatPhoneDisplay(current);
+      }
+      render();
+    }
+
+    function selectNodeContents(node) {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    function selectStandard() {
+      render();
+      selectNodeContents(el("signatureStandard"));
+      setStatus("Selected standard (Cmd+C / Ctrl+C)");
+    }
+
+    function selectLight() {
+      render();
+      const ta = el("lightText");
+      ta.focus();
+      ta.select();
+      setStatus("Selected lightweight (Cmd+C / Ctrl+C)");
+    }
+
+    ["name","title"].forEach(id => el(id).addEventListener("input", render));
+    el("phoneInput").addEventListener("input", render);
+    el("phoneInput").addEventListener("blur", onPhoneBlur);
+    el("chkShowPhone").addEventListener("change", render);
+    el("taglineSelect").addEventListener("change", render);
+
+    el("chkReview").addEventListener("change", render);
+    el("chkMeeting").addEventListener("change", render);
+    el("meetingLink").addEventListener("input", render);
+
+    el("selectStandardBtn").addEventListener("click", selectStandard);
+    el("selectLightBtn").addEventListener("click", selectLight);
+
+    el("resetBtn").addEventListener("click", () => {
+      el("name").value = "Brooke Armstrong";
+      el("title").value = "Account Executive";
+      el("phoneInput").value = "(204) 237-1212";
+      el("chkShowPhone").checked = true;
+      el("taglineSelect").value = "Give your TVs Superpowers";
+
+      el("chkReview").checked = false;
+      el("chkMeeting").checked = false;
+      el("meetingLink").value = "";
+      el("meetingLinkWrap").style.display = "none";
+
+      render();
+      setStatus("Reset");
+    });
+
+    el("chkShowPhone").checked = true;
+    el("chkReview").checked = false;
+    el("chkMeeting").checked = false;
+    el("meetingLinkWrap").style.display = "none";
+    render();
+  </script>
+</body>
+</html>
