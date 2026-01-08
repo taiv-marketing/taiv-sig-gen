@@ -326,6 +326,42 @@
       .grid{ grid-template-columns: 1fr; }
       .rightStack{ gap: 16px; }
     }
+  
+    .btnSubtle{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .btnSubtle:hover{ background: #eef2ff; color: var(--text); }
+
+    /* Dark-mode preview (visual simulation only) */
+    .sigFrame.darkPreview{
+      background: #0b1020;
+      border-style: solid;
+      border-color: rgba(229,231,235,0.18);
+    }
+    .sigFrame.darkPreview *{
+      color: #e5e7eb !important;
+    }
+    .sigFrame.darkPreview a{
+      color: #e5e7eb !important;
+    }
+    .sigFrame.darkPreview [style*="#6F3FEE"],
+    .sigFrame.darkPreview [style*="#6f3fee"]{
+      color: #6f3fee !important;
+    }
+    .sigFrame.darkPreview img{
+      filter: brightness(1.02) contrast(1.02);
+    }
+
   </style>
 </head>
 
@@ -334,7 +370,7 @@
     <div class="frame">
       <div class="topbar">
         <div class="topLeft">
-          <b>Taiv Email Sig Gen V1.2</b>
+          <b>Taiv Email Sig Gen V1.3</b>
         </div>
         <div class="statusPill" id="status">Ready</div>
       </div>
@@ -385,7 +421,7 @@
                 <input id="chkShowPhone" type="checkbox" />
                 <div>
                   <p class="toggleTitle">Show phone number</p>
-                  <p class="toggleCaption">Turn off if you do not want your number in your signature.</p>
+                  <p class="toggleCaption">Turn off if you do not want your number in your signature (Also hides taiv.tv)</p>
                 </div>
               </div>
             </div>
@@ -402,6 +438,15 @@
 
             <div class="row">
               <label>Optional additions (Standard only)</label>
+
+              <div class="toggleRow" style="margin-bottom:10px;">
+                <input id="chkAdvertisersLink" type="checkbox" />
+                <div>
+                  <p class="toggleTitle">Advertisers link (ad sales)</p>
+                  <p class="toggleCaption">Changes taiv.tv to link to /advertisers (still displays as taiv.tv).</p>
+                </div>
+              </div>
+
 
               <div class="toggleRow" style="margin-bottom:10px;">
                 <input id="chkReview" type="checkbox" />
@@ -462,17 +507,20 @@
 
               <div class="sectionLabel">
                 <div class="sectionLabelLeft">Standard (Gmail)</div>
+                <button class="btnSubtle" id="darkPreviewBtn" type="button" aria-pressed="false" title="Toggle dark mode preview">
+                  Preview dark mode
+                </button>
               </div>
 
               <div class="sigFrame">
                 <div id="signatureStandard" style="display:block; line-height:1.3; padding: 2px 0 6px 0; margin-top: 2px;">
                   <div style="display:block; padding-top: 2px;">
-                    <a href="https://taiv.tv" target="_blank" style="text-decoration:none; display:inline-block;">
+                    <a id="stdLogoLink" href="https://taiv.tv" target="_blank" style="text-decoration:none; display:inline-block;; line-height:0;">
                       <img
-                        src="https://cdn.prod.website-files.com/6452bada8ddf24f4f4b3ae18/69530146f44fd5131ebf8844_1addc7e60eeac3bfd868dd5209983ac2_Taiv%20Email%20Logo%203-02.png"
+                        src="https://cdn.prod.website-files.com/6452bada8ddf24f4f4b3ae18/695e8a135ac390a6f79a832a_Taiv%20Email%20Logo_New%20Full%20Color.png"
                         alt="Taiv"
-                        width="140"
-                        style="display:block; border:0; outline:none; text-decoration:none;"
+                        width="100"
+                        style="display:block; border:0; outline:none; text-decoration:none;; line-height:0; vertical-align:top"
                       />
                     </a>
                   </div>
@@ -483,12 +531,12 @@
                     Brooke Armstrong
                   </div>
 
-                  <div id="stdTitle" style="font-size:13px; color:#1F2933; line-height:17px; padding-bottom:6px;">
+                  <div id="stdTitle" style="font-size:11px; color:#1F2933; line-height:17px; padding-bottom:10px;">
                     Account Executive
                   </div>
 
-                  <div style="font-size:13px; color:#1F2933; line-height:17px;">
-                    <a href="https://taiv.tv" target="_blank" style="color:#1F2933; text-decoration:underline;">taiv.tv</a>
+                  <div style="font-size:11px; color:#1F2933; line-height:17px;">
+                    <a id="stdSiteLink" href="https://taiv.tv" target="_blank" style="color:#1F2933; text-decoration:underline;">taiv.tv</a>
                     <span id="stdPipe" style="display:inline;"> | </span>
                     <a id="stdPhoneLink" href="tel:+12042371212" style="color:#1F2933; text-decoration:underline;">
                       <span id="stdPhoneDisplay">(204) 237-1212</span>
@@ -496,18 +544,18 @@
                   </div>
 
                   <div id="stdTaglineWrap" style="padding-top:6px;">
-                    <div id="stdTagline" style="font-size:12px; color:#6F3FEE; line-height:16px;">
+                    <div id="stdTagline" style="font-size:11px; color:#6F3FEE; line-height:16px;">
                       Give your TVs Superpowers
                     </div>
                   </div>
 
                   <div id="stdExtrasWrap" style="display:none; padding-top:10px;">
-                    <div id="stdReviewWrap" style="display:none; font-size:12px; line-height:16px; padding-top:4px;">
+                    <div id="stdReviewWrap" style="display:none; font-size:11px; line-height:16px; padding-top:4px;">
                       <a href="https://forms.gle/uioiexjqWfEzb4TA6" target="_blank" class="extraLink">
                         Leave us a review
                       </a>
                     </div>
-                    <div id="stdMeetingWrap" style="display:none; font-size:12px; line-height:16px; padding-top:4px;">
+                    <div id="stdMeetingWrap" style="display:none; font-size:11px; line-height:16px; padding-top:4px;">
                       <a id="stdMeetingLink" href="" target="_blank" class="extraLink">
                         Book a meeting with me
                       </a>
@@ -615,6 +663,42 @@
     const statusEl = el("status");
     const MEETING_EXAMPLE = "https://calendly.com/brooke-taiv/30-minute-meeting";
 
+    const ADVERTISERS_URL = "https://www.taiv.tv/advertisers";
+
+    function setDarkPreview(on) {
+      const frame = document.querySelector(".sigFrame");
+      const btn = el("darkPreviewBtn");
+      if (!frame || !btn) return;
+
+      frame.classList.toggle("darkPreview", !!on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+
+    function toggleDarkPreview() {
+      const frame = document.querySelector(".sigFrame");
+      if (!frame) return;
+      setDarkPreview(!frame.classList.contains("darkPreview"));
+    }
+
+
+    function syncSiteLinkWithPhone() {
+      const showPhone = el("chkShowPhone") ? el("chkShowPhone").checked : true;
+      const site = el("stdSiteLink");
+      if (!site) return;
+      site.style.display = showPhone ? "inline" : "none";
+    }
+
+    function applyAdvertisersLink() {
+      const useAdvertisers = el("chkAdvertisersLink") ? el("chkAdvertisersLink").checked : false;
+      const href = useAdvertisers ? ADVERTISERS_URL : "https://taiv.tv";
+
+      const logo = el("stdLogoLink");
+      const site = el("stdSiteLink");
+      if (logo) logo.href = href;
+      if (site) site.href = href;
+    }
+
+
     function setStatus(msg) {
       statusEl.textContent = msg;
       clearTimeout(setStatus._t);
@@ -712,6 +796,9 @@
       el("stdName").textContent = name || "";
       el("stdTitle").textContent = title || "";
 
+      applyAdvertisersLink();
+      syncSiteLinkWithPhone();
+
       if (showPhone) {
         el("stdPipe").style.display = "inline";
         el("stdPhoneLink").style.display = "inline";
@@ -774,10 +861,13 @@
 
     el("chkReview").addEventListener("change", render);
     el("chkMeeting").addEventListener("change", render);
+    el("chkAdvertisersLink").addEventListener("change", render);
     el("meetingLink").addEventListener("input", render);
 
     el("selectStandardBtn").addEventListener("click", selectStandard);
     el("selectLightBtn").addEventListener("click", selectLight);
+
+    el("darkPreviewBtn").addEventListener("click", toggleDarkPreview);
 
     el("resetBtn").addEventListener("click", () => {
       el("name").value = "Brooke Armstrong";
@@ -791,14 +881,17 @@
       el("meetingLink").value = "";
       el("meetingLinkWrap").style.display = "none";
 
+      setDarkPreview(false);
       render();
       setStatus("Reset");
     });
 
     el("chkShowPhone").checked = true;
+    el("chkAdvertisersLink").checked = false;
     el("chkReview").checked = false;
     el("chkMeeting").checked = false;
     el("meetingLinkWrap").style.display = "none";
+    setDarkPreview(false);
     render();
   </script>
 </body>
