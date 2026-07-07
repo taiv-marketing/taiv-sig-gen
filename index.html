@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Taiv email signature generator</title>
 
+  <!-- First-paint theme. The Studio rail's avatar menu owns the toggle and
+       persistence; we only READ the persisted choice here so a light page
+       paints light from the first frame (no dark flash). Attribute absent =
+       dark, the brand default. -->
+  <script>
+    try {
+      if (localStorage.getItem('taiv-theme') === 'light')
+        document.documentElement.setAttribute('data-taiv-theme', 'light');
+    } catch (e) {}
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap" rel="stylesheet">
@@ -352,6 +363,43 @@
     .sigFrame.darkPreview img{
       filter: brightness(1.02) contrast(1.02);
     }
+
+    /* ==== Studio light mode ==================================================
+       Chrome only. The gateway rail owns the signal (data-taiv-theme="light"
+       on <html>; absent = dark). We respond by remapping the chrome tokens.
+       EXEMPT — untouched here, they are email content not chrome: the
+       #signatureStandard output and its inline styles, the .sigFrame "as in
+       mail" white surface (stays white in both themes), .extraLink, and the
+       .darkPreview email simulation. Values map to the brief's token table. */
+    html[data-taiv-theme='light']{
+      color-scheme: light;
+
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --overlay: #f5f7fa;
+
+      --text: #0a0420;
+      --muted: rgba(10, 4, 32, 0.62);
+
+      --hairline: rgba(10, 4, 32, 0.08);
+      --hairline-strong: rgba(10, 4, 32, 0.14);
+
+      --accent-text: #6f3fee;
+      --ring: color-mix(in srgb, #6f3fee 32%, transparent);
+    }
+
+    /* Status pill lives on the ground-toned topbar; give it the white surface
+       so it reads against the ground instead of blending into it. */
+    html[data-taiv-theme='light'] .statusPill{ background: var(--surface); }
+
+    /* Hover tints are hardcoded white-on-dark in the base rules; on light they
+       become the brief's accent hover tint. */
+    html[data-taiv-theme='light'] .btn:hover,
+    html[data-taiv-theme='light'] .btnSubtle:hover{ background: rgba(111, 63, 238, 0.10); }
+
+    /* Wordmark: the inline SVG fills with near-white ink for the dark ground.
+       On light ground, swap it to the dark-ink wordmark (Logo - Dark). */
+    html[data-taiv-theme='light'] .taiv-logo .cls-1{ fill: #0a0420; }
 
   </style>
 </head>
